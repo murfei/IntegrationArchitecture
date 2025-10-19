@@ -8,7 +8,7 @@ import java.util.List;
 
 
 public class DBClient implements ManagePersonal {
-    String uri = "mongodb+srv://murfei_db_user:k3U2RJi3lUNf93Uo@smarthooverltd.tw0ettl.mongodb.net/";
+    String uri = "mongodb+srv://<username:password>@smarthooverltd.tw0ettl.mongodb.net/";
     MongoClient mongoClient = MongoClients.create(uri);
     public MongoDatabase db = mongoClient.getDatabase("SmartHooverDB");
     MongoCollection<Document> collection = db.getCollection("data");
