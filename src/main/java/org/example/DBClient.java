@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class DBClient implements org.hbrs.ia.code.ManagePersonal {
+public class DBClient implements ManagePersonal {
     String uri = "mongodb+srv://murfei_db_user:k3U2RJi3lUNf93Uo@smarthooverltd.tw0ettl.mongodb.net/";
     MongoClient mongoClient = MongoClients.create(uri);
     MongoDatabase db = mongoClient.getDatabase("SmartHooverDB");
