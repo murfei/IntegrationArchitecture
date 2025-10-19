@@ -1,7 +1,4 @@
-package org.hbrs.ia.code;
-
-import org.example.SalesMan;
-import org.example.SocialPerformanceRecord;
+package org.example;
 
 import java.util.List;
 
