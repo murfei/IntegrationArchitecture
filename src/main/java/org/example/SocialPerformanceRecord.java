@@ -1,20 +1,18 @@
 package org.example;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 public class SocialPerformanceRecord {
-    private HashMap<String, HashMap<String, Integer>> performanceRecords;
-    private double totalBonus;
     private int year;
-    private static List<Integer> years;
+    private double totalBonus;
+    private HashMap<String, HashMap<String, Integer>> performanceRecord;
 
     public SocialPerformanceRecord(int year, List<Integer> l) {
         this.year = year;
         String[] categories = {"Leadership Competence", "Openness to Employees", "Social Behaviour to Employees",
                 "Attitude towards Clients", "Communication Skills", "Integrity to Company", "Average"};
-        performanceRecords = new HashMap<>();
+        performanceRecord = new HashMap<>();
         int sumSup = 0;
         int sumPeer = 0;
         for (int i = 0; i < 12; i += 2) {
@@ -24,19 +22,19 @@ public class SocialPerformanceRecord {
             tmp.put("Peer", l.get(i + 1));
             sumPeer += l.get(i + 1);
             tmp.put("Bonus", 0);
-            performanceRecords.put(categories[i / 2], tmp);
+            performanceRecord.put(categories[i / 2], tmp);
         }
         HashMap tmp = new HashMap<String, Integer>();
         tmp.put("Supervisor", sumSup / (categories.length - 2));
         tmp.put("Peer", sumPeer / (categories.length - 2));
-        performanceRecords.put(categories[6], tmp);
+        performanceRecord.put(categories[6], tmp);
         totalBonus = 0;
 
     }
 
     public void setBonus(String category, Integer bonus) {
-        totalBonus -= performanceRecords.get(category).get("Bonus");
-        performanceRecords.get(category).put("Bonus", bonus);
+        totalBonus -= performanceRecord.get(category).get("Bonus");
+        performanceRecord.get(category).put("Bonus", bonus);
         totalBonus += bonus;
     }
 
@@ -45,7 +43,7 @@ public class SocialPerformanceRecord {
     }
 
     public HashMap<String, HashMap<String, Integer>> getPerformanceRecords() {
-        return performanceRecords;
+        return performanceRecord;
     }
 
     public int getYear() {

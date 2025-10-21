@@ -6,7 +6,6 @@ import org.junit.jupiter.api.BeforeAll;
 import org.bson.Document;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
-import com.mongodb.client.MongoClients;
 import org.junit.jupiter.api.*;
 import static com.mongodb.client.model.Filters.eq;
 import static org.junit.jupiter.api.Assertions.*;
@@ -61,16 +60,19 @@ public class TestDBClient {
     public void testReadSalesMan() {
         dbClient.createSalesMan(testSalesman);
         SalesMan result = dbClient.readSalesMan(9999);
-
+        //positive test
         assertNotNull(result);
         assertEquals("John", result.getFirstName());
         assertEquals("Doe", result.getLastName());
         assertEquals(9999, result.getEmployee_id());
+        //negative test
+        assertNull(dbClient.readSalesMan(0));
     }
 
     @Test
     @Order(3)
     public void testAddSocialPerformanceRecord() {
+        //positive test
         dbClient.createSalesMan(testSalesman);
 
         List<Integer> scores = Arrays.asList(3,3,4,4,5,5,2,2,3,3,4,4);
@@ -82,6 +84,19 @@ public class TestDBClient {
 
         assertEquals(2, perfRecords.size());
         assertTrue(perfRecords.stream().anyMatch(r -> r.getInteger("year") == 2024));
+        //negative test
+        //trying to add a not existing record --> number of records should stay the same
+        dbClient.addSocialPerformanceRecord(null, testSalesman);
+        updated = collection.find(eq("employee_id", 9999)).first();
+        perfRecords = (List<Document>) updated.get("performanceRecords");
+        assertEquals(2, perfRecords.size());
+        //trying to add a already existing year
+        try  {
+            dbClient.addSocialPerformanceRecord(newRecord, testSalesman);
+            assert false;
+        } catch (IllegalArgumentException e) {
+            assert true;
+        }
     }
 
     @Test
@@ -91,9 +106,17 @@ public class TestDBClient {
         List<Integer> scores = Arrays.asList(3,3,4,4,5,5,2,2,3,3,4,4);
         SocialPerformanceRecord record2019 = new SocialPerformanceRecord(2019, scores);
         dbClient.addSocialPerformanceRecord(record2019, testSalesman);
-        dbClient.deleteSocialPerformanceRecord(9999, 2019);
+        //negative test --> trying to delete a record which not exists
         Document updated = collection.find(eq("employee_id", 9999)).first();
+        int recordsbefore = ((List<Document>) updated.get("performanceRecords")).size();
+        dbClient.deleteSocialPerformanceRecord(9999, 2000);
+        updated = collection.find(eq("employee_id", 9999)).first();
         List<Document> perfRecords = (List<Document>) updated.get("performanceRecords");
+        assertEquals(recordsbefore, perfRecords.size());
+        //positive test
+        dbClient.deleteSocialPerformanceRecord(9999, 2019);
+        updated = collection.find(eq("employee_id", 9999)).first();
+        perfRecords = (List<Document>) updated.get("performanceRecords");
         assertTrue(perfRecords.stream().noneMatch(r -> r.getInteger("year") == 2019));
     }
 
@@ -101,8 +124,14 @@ public class TestDBClient {
     @Order(5)
     void testDeleteSalesMan() {
         dbClient.createSalesMan(testSalesman);
+        List<SalesMan> salesMen = dbClient.readAllSalesMen();
+        int lengthbefore = salesMen.size();
+        //neagtive test --> trying to delete a not existing employeeID
+        dbClient.deleteSalesMan(1);
+        salesMen = dbClient.readAllSalesMen();
+        assertEquals(lengthbefore, salesMen.size());
+        //positive test
         dbClient.deleteSalesMan(9999);
-
         Document deleted = collection.find(eq("employee_id", 9999)).first();
         assertNull(deleted);
     }
